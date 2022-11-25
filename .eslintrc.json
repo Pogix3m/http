@@ -1,24 +1,23 @@
-module.exports = {
-    root: true,
-    parser: "@typescript-eslint/parser",
-    parserOptions: {
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
         "project": "tsconfig.json",
+        "sourceType": "module"
     },
-    plugins: [
+    "plugins": [
         "@typescript-eslint",
+        "eslint-plugin-import"
     ],
-    extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "prettier",
-    ],
-    rules: {
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+    "rules": {
         "@typescript-eslint/array-type": [
             "error",
             {
                 "default": "array"
             }
         ],
+        "@typescript-eslint/dot-notation": "error",
         "@typescript-eslint/explicit-member-accessibility": [
             "error",
             {
@@ -46,8 +45,8 @@ module.exports = {
         "@typescript-eslint/member-ordering": [
             "error",
             {
-                default: {
-                    memberTypes: [
+                "default": {
+                    "memberTypes": [
                         // private/protected members // Declare your data
                         // constructor               // Initialize your data
                         // private methods           // Manage your data
@@ -59,10 +58,8 @@ module.exports = {
                         "private-static-field",
                         "protected-static-field",
 
-                        "private-field",
-                        "protected-field",
-
-                        "public-static-field",
+                        // "private-field",
+                        // "protected-field",
                         "public-field",
 
                         "constructor",
@@ -71,11 +68,12 @@ module.exports = {
                         "private-method",
                         "protected-method",
 
+                        "public-static-field",
                         "public-static-method",
-                        "public-method",
+                        "public-method"
                     ],
-                    order: "alphabetically",
-                },
+                    "order": "alphabetically"
+                }
             }
         ],
         "@typescript-eslint/naming-convention": [
@@ -92,11 +90,11 @@ module.exports = {
             },
             {
                 "selector": "variableLike",
-                "format": ["camelCase", "PascalCase", "UPPER_CASE"],
-            },
+                "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+            }
         ],
         "@typescript-eslint/no-empty-function": "off",
-        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true, "varsIgnorePattern": "^__" }],
@@ -106,36 +104,40 @@ module.exports = {
             "double",
             { "allowTemplateLiterals": true }
         ],
-        // "@typescript-eslint/tslint/config": [
-        //     "error",
-        //     {
-        //         "rules": {
-        //             "typedef": [
-        //                 true,
-        //                 // "arrow-call-signature",
-        //                 "arrow-parameter",
-        //                 "call-signature",
-        //                 "member-variable-declaration",
-        //                 "parameter",
-        //                 "property-declaration",
-        //                 "variable-declaration",
-        //                 "variable-declaration-ignore-function"
-        //             ],
-        //             "whitespace": [
-        //                 true,
-        //                 "check-branch",
-        //                 "check-decl",
-        //                 "check-operator",
-        //                 "check-separator",
-        //                 "check-type",
-        //                 "check-type-operator",
-        //                 "check-preblock"
-        //             ],
-        //             "ordered-imports": true,
-        //             "semicolon": [true, "always"],
-        //         }
-        //     }
-        // ],
+         "@typescript-eslint/semi": [
+             "error",
+             "always"
+         ],
+//        "@typescript-eslint/tslint/config": [
+//            "error",
+//            {
+//                "rules": {
+//                    "typedef": [
+//                        true,
+//                        // "arrow-call-signature",
+//                        "arrow-parameter",
+//                        "call-signature",
+//                        "member-variable-declaration",
+//                        "parameter",
+//                        "property-declaration",
+//                        "variable-declaration",
+//                        "variable-declaration-ignore-function"
+//                    ],
+//                    "whitespace": [
+//                        true,
+//                        "check-branch",
+//                        "check-decl",
+//                        "check-operator",
+//                        "check-separator",
+//                        "check-type",
+//                        "check-type-operator",
+//                        "check-preblock"
+//                    ],
+//                    "ordered-imports": true,
+//                    "semicolon": [true, "always"]
+//                }
+//            }
+//        ],
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/typedef": [
             "error",
@@ -169,13 +171,14 @@ module.exports = {
         "max-len": [
             "error",
             {
+                "ignoreComments": true,
                 "ignorePattern": "//",
                 "code": 120
             }
         ],
         "newline-per-chained-call": "off",
         "no-async-promise-executor": "off",
-        "no-console": "off",
+        "no-console": "error",
         "no-duplicate-imports": "error",
         "no-irregular-whitespace": "error",
         "no-magic-numbers": "off",
@@ -184,7 +187,7 @@ module.exports = {
         "object-curly-spacing": ["error", "always"],
         "one-var": [
             "error",
-            "never",
+            "never"
         ],
         "prefer-const": "error",
         "spaced-comment": [
@@ -203,17 +206,6 @@ module.exports = {
         "space-in-parens": [
             "error",
             "never"
-        ],
-        "semi": "off",
-        "@typescript-eslint/semi": [
-            "error",
-            "always"
-        ],
-        // "unicorn/filename-case": [
-        //     "error",
-        //     {
-        //         "case": "pascalCase"
-        //     }
-        // ]
-    },
-};
+        ]
+    }
+}
