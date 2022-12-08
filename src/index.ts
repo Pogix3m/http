@@ -41,8 +41,10 @@ export class HTTPError extends Error {
     }
 
     public constructor(error: AxiosError, options?: Record<string, unknown>) {
+        const code: string = error.response?.status?.toString() || error.code?.toString() || "Unknown Code";
+        const message: string = error.response?.statusText || error.message || "Unknown error message";
         super(
-            `${ error.response?.status || "N/A" }: ${ error.response?.statusText || "Unknown error response" }`,
+            `${ code }: ${ message }`,
         );
         this.data = {
             ...options,
