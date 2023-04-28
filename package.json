@@ -1,6 +1,6 @@
 {
     "name": "@pogix3m/http",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Make http request using axios",
     "main": "dist/index.js",
     "engines": {
