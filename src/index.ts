@@ -1,17 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import RateLimit, { TRateLimit } from "@pogix3m/rate-limit";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { v4 } from "uuid";
 
 export type THTTOptions = Partial<{
     errorFormatter: (error: unknown) => never;
-    logger: {
+    logger: Partial<{
         info: (message: string, data?: unknown) => void;
         error: (message: string, data?: unknown) => void;
-    };
+    }>;
     rateLimit: TRateLimit;
 }>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type THTTPConfig<Data = any> = AxiosRequestConfig<Data> & Partial<{ weight: number; requestId: string }>;
 
 export interface IHTTP<Response = unknown>{
@@ -19,12 +19,12 @@ export interface IHTTP<Response = unknown>{
     Get<T extends Response>(url: string, config?: THTTPConfig): Promise<THTTPResponse<T>>;
     Patch<T extends Response>(url: string, data?: unknown, config?: THTTPConfig): Promise<THTTPResponse<T>>;
     Post<T extends Response>(url: string, data?: unknown, config?: THTTPConfig): Promise<THTTPResponse<T>>;
+    Put<T extends Response>(url: string, data?: unknown, config?: THTTPConfig): Promise<THTTPResponse<T>>;
 }
 
 export type THTTPResponse<Data = unknown> = {
     status: number;
     statusText: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     headers: Record<string, any>;
     data: Data;
 };
@@ -57,7 +57,6 @@ export class HTTPError extends Error {
         return error
             && typeof error === "object"
             && "isAxiosError" in error
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             && (error as any).isAxiosError;
     }
 }
@@ -93,13 +92,12 @@ export default class HTTP<Response> implements IHTTP<Response>{
                 error,
                 { ...config, baseUrl: this.baseURL, url, requestData, method, requestId },
             );
-            this.logger?.error(httpError.Message, httpError.Data);
+            this.logger?.error?.(httpError.Message, httpError.Data);
             this.errorFormatter?.(httpError);
 
             throw httpError;
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.logger?.error((error as any)?.message, JSON.stringify(error));
+        this.logger?.error?.((error as Error)?.message, JSON.stringify(error));
 
         throw error;
     }
@@ -117,7 +115,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
 
     public async Delete<T extends Response>(url: string, config?: THTTPConfig): Promise<THTTPResponse<T>> {
         const requestId: string = config?.requestId || v4();
-        this.logger?.info(
+        this.logger?.info?.(
             `Delete '${ this.baseURL }${ url }' request`,
             {
                 config,
@@ -143,7 +141,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
                 requestId,
             }));
         const totalTime: number = Date.now() - start;
-        this.logger?.info(
+        this.logger?.info?.(
             `Delete '${ this.baseURL }${ url }' response`,
             {
                 requestId,
@@ -157,7 +155,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
 
     public async Get<T extends Response>(url: string, config?: THTTPConfig): Promise<THTTPResponse<T>> {
         const requestId: string = config?.requestId || v4();
-        this.logger?.info(
+        this.logger?.info?.(
             `Get '${ this.baseURL }${ url }' request`,
             {
                 config,
@@ -177,7 +175,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
             .then((result: AxiosResponse<T>) => this.GetResponse(result))
             .catch((error: unknown) => this.FormatError({ error, method: "get", url, config, requestId }));
         const totalTime: number = Date.now() - start;
-        this.logger?.info(
+        this.logger?.info?.(
             `Get '${ this.baseURL }${ url }' response`,
             {
                 requestId,
@@ -195,7 +193,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
         config?: THTTPConfig,
     ): Promise<THTTPResponse<T>> {
         const requestId: string = config?.requestId || v4();
-        this.logger?.info(
+        this.logger?.info?.(
             `Patch '${ this.baseURL }${ url }' request`,
             {
                 data,
@@ -224,7 +222,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
                 requestData: data,
             }));
         const totalTime: number = Date.now() - start;
-        this.logger?.info(
+        this.logger?.info?.(
             `Patch '${ this.baseURL }${ url }' response`,
             {
                 requestId,
@@ -242,7 +240,7 @@ export default class HTTP<Response> implements IHTTP<Response>{
         config?: THTTPConfig,
     ): Promise<THTTPResponse<T>> {
         const requestId: string = config?.requestId || v4();
-        this.logger?.info(
+        this.logger?.info?.(
             `Post '${ this.baseURL }${ url }' request`,
             {
                 data,
@@ -271,11 +269,58 @@ export default class HTTP<Response> implements IHTTP<Response>{
                 requestData: data,
             }));
         const totalTime: number = Date.now() - start;
-        this.logger?.info(
+        this.logger?.info?.(
             `Post '${ this.baseURL }${ url }' response`,
             {
                 requestId,
                 requestData: data,
+                response,
+                totalTimeMS: totalTime,
+            },
+        );
+
+        return response;
+    }
+
+    public async Put<T extends Response>(
+        url: string,
+        data?: unknown,
+        config?: THTTPConfig,
+    ): Promise<THTTPResponse<T>> {
+        const requestId: string = config?.requestId || v4();
+        this.logger?.info?.(
+            `Put '${ this.baseURL }${ url }' request`,
+            {
+                data,
+                config,
+                requestId,
+            },
+        );
+        await this.rateLimit?.Check(config?.weight);
+        const start: number = Date.now();
+        const response: THTTPResponse<T> = await axios
+            .put<T>(
+                url,
+                data,
+                {
+                    ...this.defaultConfig,
+                    ...config,
+                    baseURL: this.baseURL,
+                })
+            .then((result: AxiosResponse<T>) => this.GetResponse(result))
+            .catch((error: unknown) => this.FormatError({
+                error,
+                method: "patch",
+                url,
+                config,
+                requestId,
+                requestData: data,
+            }));
+        const totalTime: number = Date.now() - start;
+        this.logger?.info?.(
+            `Put '${ this.baseURL }${ url }' response`,
+            {
+                requestId,
                 response,
                 totalTimeMS: totalTime,
             },
