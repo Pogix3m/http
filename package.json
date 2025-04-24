@@ -4,8 +4,8 @@
     "description": "Make http request using axios",
     "main": "dist/index.js",
     "engines": {
-        "node": ">=22.12.0",
-        "npm": ">=8.15.0"
+        "node": ">=22.0.0",
+        "npm": ">=10.0.0"
     },
     "author": {
         "name": "Harold Niones",
