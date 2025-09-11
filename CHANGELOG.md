@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.1
+- Update packages
+
 ## [1.1.0](https://github.com/Pogix3m/http/issues/7)
 - Include PUT method
 
